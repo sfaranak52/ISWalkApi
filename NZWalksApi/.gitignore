@@ -1,0 +1,18 @@
+# Ignore compiled output and temporary files
+/bin/
+/obj/
+*.exe
+*.dll
+*.pdb
+
+# Ignore log files
+*.log
+
+# Ignore NuGet packages
+*.nupkg
+
+# Ignore Visual Studio files
+.vs/
+*.suo
+*.user
+*.sln.docstates
