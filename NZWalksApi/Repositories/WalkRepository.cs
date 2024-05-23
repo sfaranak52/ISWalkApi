@@ -1,7 +1,9 @@
 ﻿using ISWalksApi.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NZWalksApi.Data;
 using NZWalksApi.Models.Domain;
+using System.Diagnostics.SymbolStore;
 
 namespace ISWalksApi.Repositories
 {
@@ -26,9 +28,38 @@ namespace ISWalksApi.Repositories
             return walk;
         }
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null
+            , string? sortBy = null, bool isAscending = true
+            , int pagenumber = 1, int pageSize = 1000)
         {
-            return await _iSWalksDb.Walks.ToListAsync();
+            var walks = _iSWalksDb.Walks.Include(x => x.Difficulty).Include(x => x.Region).AsQueryable();
+            
+            //Filtering
+            if(string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(x=>x.Name.Contains(filterQuery));
+                }
+            }
+
+            //Sorting
+            if (string.IsNullOrWhiteSpace(sortBy) == false)
+            {
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.Name): walks.OrderByDescending(x => x.Name);
+                }
+                else if (sortBy.Equals("Lenght", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(x => x.LengthInKm) : walks.OrderByDescending(x => x.LengthInKm);
+                }
+            }
+
+            //Pagination
+            var skipResult = (pagenumber - 1) * pageSize;
+
+            return await walks.Skip(skipResult).Take(pageSize).ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)

@@ -21,13 +21,16 @@ namespace NZWalksApi.Controllers
             _walkRepository = walkRepository;
             _mapper = mapper;
         }
-        
-        // Get All Walks
+
+        // Get Walks
+        // Get: /api/walks?filterOn=Name&filterQuery=Jolfa&sortBy=Name&isAscending=true&pageNumber=1&pageSize=10
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery, 
+            [FromQuery] string? sortBy, [FromQuery] bool? isAscending,
+            [FromQuery] int pagenumber = 1, [FromQuery] int pageSize = 1000)
         {
             // Get Data From Database - Domain Models
-            var walks = await _walkRepository.GetAllAsync();
+            var walks = await _walkRepository.GetAllAsync(filterOn,filterQuery,sortBy,isAscending ?? true, pagenumber, pageSize);
 
             // Map Domain Models to DTOs
             //Return Dto
