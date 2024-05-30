@@ -5,7 +5,7 @@ namespace NZWalksApi.Data
 {
     public class ISWalksDbContext : DbContext
     {
-        public ISWalksDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        public ISWalksDbContext(DbContextOptions<ISWalksDbContext> dbContextOptions) : base(dbContextOptions)
         {
 
         }
